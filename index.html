@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Benim TV</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Nunito+Sans:wght@400;600;700&display=swap">
@@ -13,7 +14,7 @@
    ===================================================================== */
 
 // 1) YouTube API anahtarını tırnakların arasına yapıştır:
-var YOUTUBE_ANAHTARI = "";
+var YOUTUBE_ANAHTARI = "AIzaSyCEHSK6BHUhpF_o0Eg4hWmZ0dNe__Eh5wE";
 
 // 2) YouTube kanalların. "kaynak" şunlardan biri olabilir:
 //    "user:kullaniciadi"  (eski tip adres: youtube.com/user/...)
@@ -47,6 +48,7 @@ var RADYOLAR = [
   color-scheme: dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{height:100%;margin:0}
 body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:calc(var(--u)*2.2);overflow:hidden}
 button{font:inherit;color:inherit}
@@ -394,7 +396,10 @@ function videoAc(id, kaynak){
   if(calanIdx>=0) radyoDur();
   sonOdak.video = kaynak || document.activeElement;
   var o=$("oynatici");
-  o.innerHTML = '<iframe allow="autoplay; fullscreen; encrypted-media" allowfullscreen src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id)+'?autoplay=1&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3"></iframe>';
+  if(location.protocol === "file:") mesaj("Videolar sadece sayfa internette (GitHub) yayınlanınca oynar.");
+  var org = /^https?:/.test(location.protocol) ? "&origin="+encodeURIComponent(location.origin) : "";
+  // YouTube needs the page's address (Referer) to allow embedding — otherwise Error 153.
+  o.innerHTML = '<iframe referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen src="https://www.youtube.com/embed/'+encodeURIComponent(id)+'?autoplay=1&rel=0&playsinline=1&iv_load_policy=3'+org+'"></iframe>';
   o.hidden=false; katmanAc("video");
   setTimeout(function(){ var f=o.querySelector("iframe"); if(f) try{ f.focus(); }catch(e){} }, 400);
 }
